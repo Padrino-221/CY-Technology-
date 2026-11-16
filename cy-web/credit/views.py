@@ -3,6 +3,7 @@ from contextlib import nullcontext
 from datetime import timedelta
 
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
@@ -310,8 +311,9 @@ class CustomerForm(forms.ModelForm):
     def clean_photo(self):
         image = self.cleaned_data["photo"]
         if image and hasattr(image, "image"):
-            if image.size > 5 * 1024 * 1024:
-                raise forms.ValidationError("Choose an image no larger than 5 MB.")
+            limit = getattr(settings, "CY_PHOTO_UPLOAD_LIMIT", 5 * 1024 * 1024)
+            if image.size > limit:
+                raise forms.ValidationError(f"Choose an image no larger than {limit // 1_000_000} MB.")
             if image.image.format not in PHOTO_TYPES:
                 raise forms.ValidationError("Choose a JPEG, PNG, GIF, BMP, or WebP photo.")
         return image
@@ -325,8 +327,9 @@ class MultiPhotoField(forms.ImageField):
     def clean(self, data, initial=None):
         if not data:
             return []
-        if len(data) > 8 or sum(file.size for file in data) > 7 * 1024 * 1024:
-            raise forms.ValidationError("Choose up to eight photos with a combined size of 7 MB or less.")
+        limit = getattr(settings, "CY_PHOTO_UPLOAD_LIMIT", 7 * 1024 * 1024)
+        if len(data) > 8 or sum(file.size for file in data) > limit:
+            raise forms.ValidationError(f"Choose up to eight photos with a combined size of {limit // 1_000_000} MB or less.")
         clean_image = super().clean
         images = [clean_image(file) for file in data]
         if any(image.image.format not in PHOTO_TYPES for image in images):
@@ -495,6 +498,7 @@ def record_form(request, section, pk, editing):
         "laptop_photos": list(instance.photos.all()) if instance and model is Laptop else [],
         "customer_groups": [(label, [form[name] for name in names]) for label, names in CUSTOMER_GROUPS]
         if model is Customer else [],
+        "photo_upload_limit": getattr(settings, "CY_PHOTO_UPLOAD_LIMIT", None),
         "no_available_laptops": model is Sale and not instance and not form.fields["laptop"].queryset.exists(),
         "customer_wizard": model is Customer and pk is None,
         "can_delete": instance and (model is not Laptop or not instance.sale_history.exists()),

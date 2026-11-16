@@ -2,5 +2,5 @@
 <input class="upload-source" type="file" name="photo" id="{{ field.id_for_label }}" accept="image/*" aria-describedby="photo-file-name">
 <label class="upload-trigger" for="{{ field.id_for_label }}">
 {% include "icon.html" with name="upload-simple" only %}
-<span><strong>Choose photo</strong><small id="photo-file-name" aria-live="polite">Image file up to 5 MB</small></span>
+<span><strong>Choose photo</strong><small id="photo-file-name" aria-live="polite">Image file up to {% if photo_upload_limit %}4{% else %}5{% endif %} MB</small></span>
 </label></div>{% if record.photo %}<label class="photo-clear"><input type="checkbox" name="photo-clear" value="on"> Remove current photo</label>{% endif %}{% else %}{% include "field_widget.html" %}{% endif %}{{ field.errors }}</div>

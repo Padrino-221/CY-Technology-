@@ -3,3 +3,8 @@ __pycache__/
 *.sqlite3
 media/
 wheelhouse/
+.env*
+.vercel/
+staticfiles/
+*.sqlite3-*
+cy-transfer.json

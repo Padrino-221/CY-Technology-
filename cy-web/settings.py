@@ -6,6 +6,7 @@ SECRET_KEY = os.getenv("CY_SECRET_KEY", "local-prototype-only")
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 ROOT_URLCONF = "urls"
+WSGI_APPLICATION = "wsgi.application"
 INSTALLED_APPS = [
     "django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions",
     "django.contrib.messages", "django.contrib.staticfiles", "credit",

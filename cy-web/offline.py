@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.http import FileResponse, JsonResponse
 from django.middleware.csrf import get_token
+from django.utils.cache import add_never_cache_headers
 from django.views.decorators.http import require_GET
 
 from credit.models import OfflineReceipt, OfflineRevision
@@ -59,6 +60,7 @@ class OfflineMiddleware:
             if (request.path not in {"/account/password/", "/login/", "/logout/"}
                     and response.status_code == 200
                     and response.get("Content-Type", "").startswith("text/html")):
+                add_never_cache_headers(response)
                 response["X-CY-Offline-Page"] = str(request.user.pk)
             return response
         if request.method != "POST" or not is_operation(request.path):

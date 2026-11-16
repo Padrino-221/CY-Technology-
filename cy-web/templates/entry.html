@@ -4,7 +4,7 @@
 {% if no_available_laptops %}
 <section class="card"><h2>No laptops available for sale</h2><p>Add a laptop or release an inspected laptop before creating a sale.</p><p><a class="back" href="{% url 'records' 'inventory' %}">Open laptop inventory</a></p></section>
 {% else %}
-<form class="card entry" method="post" enctype="multipart/form-data"{% if customer_wizard %} data-wizard{% endif %}>
+<form class="card entry" method="post"{% if photo_upload_limit %} data-upload-limit="{{ photo_upload_limit }}"{% endif %} enctype="multipart/form-data"{% if customer_wizard %} data-wizard{% endif %}>
 {% csrf_token %}{{ form.non_field_errors }}
 {% if section == 'customers' %}<div class="entry-intro">{% if record.photo %}<img class="portrait" src="{% url 'photo' record.pk %}" alt="Customer photo">{% endif %}<div><h2>Customer details</h2><p>Enter the Ghana Card PIN as GHA-123456789-0.</p></div></div>{% endif %}
 {% if section == 'sales' %}<p class="flash">{% if record and form.days.field.disabled %}Financial terms are locked because this sale has repayments. You can still edit the agreement reference, signature status, officer, and notes.{% else %}Minimum deposit {{ form.rules.minimum_deposit|floatformat:-2 }}%. Maximum term {{ form.rules.maximum_term }} days. Interest on the original cash price: {{ form.rules.rate_1_to_30|floatformat:-2 }}% (1–30 days), {{ form.rules.rate_31_to_60|floatformat:-2 }}% (31–60 days), or {{ form.rules.rate_61_to_90|floatformat:-2 }}% (61–90 days).{% endif %}</p>{% endif %}

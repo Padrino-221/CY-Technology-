@@ -1,0 +1,9 @@
+*.sqlite3*
+media/
+wheelhouse/
+.venv/
+__pycache__/
+.env*
+staticfiles/
+CRAG OFFICIAL LOGO PNGTYPE (1).png
+cy-transfer.json

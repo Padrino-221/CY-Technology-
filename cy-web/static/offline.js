@@ -103,8 +103,10 @@
                         "X-CY-Operation": entry.id, "X-CY-Revision": String(entry.revision),
                     }, redirect: "error"});
                     if (!response.ok) {
-                        if ([400, 409, 422].includes(response.status)) {
-                            entry.error = (await response.json()).error;
+                        if ([400, 409, 413, 422].includes(response.status)) {
+                            entry.error = response.status === 413
+                                ? "The upload exceeds the hosted request limit. Resubmit with smaller photos."
+                                : (await response.json()).error;
                             await store("readwrite", records => records.put(entry));
                             await show();
                         }
@@ -139,6 +141,15 @@
             return;
         }
         if (url.origin !== location.origin || !operation.test(url.pathname)) return;
+        const limit = Number(form.dataset.uploadLimit);
+        const bytes = [...form.querySelectorAll('input[type="file"]')]
+            .flatMap(input => [...input.files]).reduce((total, file) => total + file.size, 0);
+        if (limit && bytes > limit) {
+            event.preventDefault();
+            panel.hidden = false;
+            status.textContent = "Choose photos totaling 4 MB or less per submission.";
+            return;
+        }
         // Persist first, even when the browser believes it is connected.
         queueMode = !navigator.onLine;
         event.preventDefault();

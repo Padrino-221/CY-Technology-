@@ -12,3 +12,5 @@ python -m venv .venv
 ```
 
 Open http://127.0.0.1:8000 and sign in. The demo seed is optional and contains fictional records. Every signed-in account can use the front desk screens in this prototype. It uses SQLite and local photo storage. Keep it on loopback with sample records. Shared deployment, role separation, and Access migration are outside this local prototype.
+
+For online hosting, see [Deploy Credit Manager on Vercel](VERCEL-DEPLOY.md).
