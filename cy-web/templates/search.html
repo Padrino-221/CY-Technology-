@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><span class="eyebrow">WORKSPACE</span><h1>Search</h1>
+{% if query %}<p>{{ total }} result{{ total|pluralize }} for “{{ query }}”</p>{% else %}<p>Search by name, code, phone number, serial number, or payment reference.</p>{% endif %}</div></div>
+{% for section, label, rows, count in groups %}
+{% if rows %}
+<section class="card search-results">
+  <div class="card-head"><h2>{{ label }} <span class="pill">{{ count }}</span></h2><a class="button outline small" href="{% url 'records' section %}?q={{ query|urlencode }}">View all</a></div>
+  {% for row in rows %}
+    {% if section == "payments" %}
+      <a class="search-result" href="{% url 'edit' 'payments' row.pk %}"><b>{{ row.code }}</b><small>{{ row.sale.customer }} · {{ row.method }}{% if row.reference %} · {{ row.reference }}{% endif %}</small></a>
+    {% else %}
+      <a class="search-result" href="{% url 'edit' section row.pk %}"><b>{{ row }}</b><small>{{ row.code }}{% if section == "customers" %} · {{ row.phone }}{% elif section == "inventory" %} · {{ row.serial }}{% endif %}</small></a>
+    {% endif %}
+  {% endfor %}
+</section>
+{% endif %}
+{% endfor %}
+{% if query and not total %}<section class="card"><p class="empty">No matching records. Try a shorter name or check the code or reference.</p></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><span class="eyebrow">OPERATIONS OVERVIEW</span><h1>Dashboard</h1><p>Track credit sales, repayments and the accounts that need attention.</p></div><div class="actions"><a class="button" href="{% url 'new' 'customers' %}">{% include "icon.html" with name="plus" only %} New customer</a><a class="button outline" href="{% url 'new' 'sales' %}">New credit sale</a></div></div>
+<section class="metrics" aria-label="Portfolio totals">
+<a class="metric primary" href="{% url 'records' 'sales' %}"><span>Outstanding credit <i>{% include "icon.html" with name="arrow-up-right" only %}</i></span><strong>GH₵ {{ outstanding|floatformat:"2g" }}</strong><small>Across all credit agreements</small></a>
+<a class="metric" href="{% url 'records' 'sales' %}"><span>Credit agreements <i>{% include "icon.html" with name="arrow-up-right" only %}</i></span><strong>{{ total }}</strong><small>Recorded sales</small></a>
+<a class="metric" href="{% url 'records' 'inventory' %}?stock=1"><span>Laptops in stock <i>{% include "icon.html" with name="arrow-up-right" only %}</i></span><strong>{{ stock }}</strong><small>Available for sale</small></a>
+<a class="metric" href="{% url 'records' 'follow-up' %}"><span>Need follow-up <i>{% include "icon.html" with name="arrow-up-right" only %}</i></span><strong>{{ due }}</strong><small>Due soon or behind schedule</small></a>
+</section>
+<div class="grid">
+<section class="card activity"><div class="card-head"><div><h2>Credit activity</h2><p>New agreements over the last 7 days</p></div><span class="pill">Last 7 days</span></div>
+<div class="bars">{% for day, count, height in bars %}<div><div class="bar-track" title="{{ day }}: {{ count }} sales"><div class="bar" style="height:{{ height }}%"></div></div><small>{{ day }}</small></div>{% endfor %}</div></section>
+<section class="card follow"><div class="card-head"><div><h2>Follow-up queue</h2><p>Prioritized by next due date</p></div><a class="circle" aria-label="View follow-up queue" href="{% url 'records' 'follow-up' %}">{% include "icon.html" with name="arrow-up-right" only %}</a></div>
+{% for sale in followups %}<a class="queue" href="{% url 'edit' 'sales' sale.pk %}"><span class="avatar">{{ sale.customer.full_name|slice:":1" }}</span><span><b>{{ sale.customer }}</b><small>{{ sale.next_due|date:"d M" }} · {{ sale.status }}</small></span><strong>GH₵ {{ sale.balance|floatformat:"2g" }}</strong></a>{% empty %}<p class="empty">No accounts require follow-up.</p>{% endfor %}</section>
+<section class="card recent"><div class="card-head"><div><h2>Recent credit sales</h2><p>Latest agreements recorded by your team</p></div><a class="button outline small" href="{% url 'records' 'sales' %}">View all</a></div>
+<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Agreement</th><th>Balance</th><th>Status</th></tr></thead><tbody>
+{% for sale in agreements %}<tr><td>{{ sale.customer }}</td><td><a href="{% url 'edit' 'sales' sale.pk %}">{{ sale.code }}</a></td><td>GH₵ {{ sale.balance|floatformat:"2g" }}</td><td><span class="pill">{{ sale.status }}</span></td></tr>{% empty %}<tr><td colspan="4" class="empty">New agreements will appear here.</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="card progress"><div class="card-head"><div><h2>Portfolio progress</h2><p>Share of agreements paid in full</p></div></div><div class="gauge" style="--progress:{{ progress }}%"><div><strong>{{ progress }}%</strong><small>Paid in full</small></div></div><p class="legend">● Paid in full <span>◌ Open accounts</span></p></section>
+</div>
+<section class="card" style="margin-top:9px">
+<div class="card-head"><div><h2>Cost and profit</h2><p>Agreed margin and cash recovered so far</p></div><a class="button outline small" href="{% url 'records' 'profit' %}">View by sale</a></div>
+<div class="table-wrap"><table><thead><tr><th>Laptop cost</th><th>Agreed profit</th><th>Cash profit</th><th>Sales with unrecovered cost</th></tr></thead><tbody><tr><td>GH₵ {{ cost_total|floatformat:"2g" }}</td><td>GH₵ {{ profit_agreed|floatformat:"2g" }}</td><td>GH₵ {{ cash_profit|floatformat:"2g" }}</td><td>{{ cost_unrecovered }}</td></tr></tbody></table></div>
+</section>
+<section class="card report-card"><div class="card-head"><div><h2>Sales and collections</h2><p>Totals for agreements excluding returns, in Ghana cedis</p></div><a class="button outline small" href="{% url 'reports' %}">View reports</a></div>
+<div class="table-wrap"><table><thead><tr><th>Cash value sold</th><th>Deposits collected</th><th>Repayments collected</th><th>Interest agreed</th></tr></thead><tbody><tr><td>GH₵ {{ cash_value|floatformat:"2g" }}</td><td>GH₵ {{ deposits|floatformat:"2g" }}</td><td>GH₵ {{ repayments|floatformat:"2g" }}</td><td>GH₵ {{ interest|floatformat:"2g" }}</td></tr></tbody></table></div></section>
+<section class="card report-card"><div class="card-head"><div><h2>Returned sales and refunds</h2><p>Collections retained in return history and refund payments recorded</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Original deposits</th><th>Original repayments</th><th>Refunds paid</th><th>Refunds still due</th></tr></thead><tbody><tr><td>GH₵ {{ returned_deposits|floatformat:"2g" }}</td><td>GH₵ {{ returned_repayments|floatformat:"2g" }}</td><td>GH₵ {{ refunds_paid|floatformat:"2g" }}</td><td>GH₵ {{ refunds_pending|floatformat:"2g" }}</td></tr></tbody></table></div></section>
+{% endblock %}

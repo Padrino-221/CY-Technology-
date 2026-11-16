@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block workspace %}
+<section class="card entry"><h1>Delete {{ singular }}?</h1><p>Delete {{ record }} permanently?</p>
+<form method="post" class="actions form-actions">{% csrf_token %}<button class="button danger" type="submit">Delete {{ singular }}</button><a class="button outline" href="{% url 'edit' section record.pk %}">Cancel</a></form></section>
+{% endblock %}

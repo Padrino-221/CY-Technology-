@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block page_title %}Front desk sign-in{% endblock %}
+{% block public %}
+<main class="signin">
+  <aside class="signin-brand">
+    <div class="brand">
+      <span class="brand-logo"><img src="{% static 'company-logo.png' %}" alt="" width="38" height="38"></span>
+      <span>CY Technologies<small>Credit Manager</small></span>
+    </div>
+    <div class="signin-intro">
+      <span class="eyebrow">FRONT DESK WORKSPACE</span>
+      <h2>Your credit operations in one place.</h2>
+      <p>Manage customers, laptop inventory, credit sales, and repayments.</p>
+    </div>
+    <span class="signin-location">CY Technologies <span aria-hidden="true">·</span> Sunyani</span>
+  </aside>
+  <section class="signin-content" aria-labelledby="signin-title">
+    <div class="signin-form">
+      <span class="signin-icon">
+        {% include "icon.html" with name="lock" only %}
+      </span>
+      <h1 id="signin-title">Front desk sign-in</h1>
+      <p>Enter your username and password to continue.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="button" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}

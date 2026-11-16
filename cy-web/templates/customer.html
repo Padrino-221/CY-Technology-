@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'records' 'customers' %}">Customers</a>
+<div class="heading entry-heading"><div class="customer-identity">
+{% if customer.photo %}<img class="portrait" src="{% url 'photo' customer.pk %}" alt="Photo of {{ customer.full_name }}">{% else %}<span class="avatar portrait" aria-hidden="true">{{ customer.full_name|slice:":1"|upper }}</span>{% endif %}
+<div><span class="eyebrow">CUSTOMER PROFILE</span><h1>{{ customer.full_name }}</h1><p>Customer code {{ customer.code }}</p></div></div>
+<div class="actions"><a class="button" href="{% url 'change' 'customers' customer.pk %}">Edit info</a><a class="button outline" href="{% url 'new' 'customers' %}">New customer</a></div></div>
+<section class="card">
+<div class="entry-intro"><h2>Customer details</h2></div>
+{% for heading, details in profile_groups %}<h3 class="profile-group-heading">{{ heading }}</h3><dl class="fields profile-fields">
+{% for label, value in details %}<div><dt>{{ label }}</dt><dd>{% if value is True %}Yes{% elif value is False %}No{% elif value %}{{ value }}{% else %}—{% endif %}</dd></div>{% endfor %}
+</dl>{% endfor %}<dl class="profile-fields"><div><dt>Notes</dt><dd>{{ customer.notes|default:"—"|linebreaksbr }}</dd></div></dl>
+</section>
+<section class="card report-card"><div class="card-head"><div><h2>Credit agreements</h2><p>Outstanding balance GH₵ {{ outstanding|floatformat:"2g" }}</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>Agreement</th><th>Laptop</th><th>Outstanding</th><th>Status</th></tr></thead><tbody>{% for sale in customer_sales %}<tr><td><a href="{% url 'edit' 'sales' sale.pk %}">{{ sale.code }}</a></td><td>{{ sale.laptop }}</td><td>GH₵ {{ sale.balance|floatformat:"2g" }}</td><td><span class="pill">{{ sale.status }}</span></td></tr>{% empty %}<tr><td colspan="4" class="empty">No credit agreements.</td></tr>{% endfor %}</tbody></table></div>
+{% include "pagination.html" with page_obj=customer_sales %}</section>
+{% endblock %}

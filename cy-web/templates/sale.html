@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><a class="back" href="{% url 'records' 'sales' %}">{% include "icon.html" with name="arrow-left" only %} Credit sales</a><h1>{{ sale.code }}</h1><p>{{ sale.customer }} · {{ sale.laptop }}</p></div>{% if sale.balance %}<a class="button" href="{% url 'new' 'payments' %}?sale={{ sale.pk }}">{% include "icon.html" with name="plus" only %} Record repayment</a>{% endif %}</div>
+{% if sale.returned_on %}<section class="card"><h2>Returned {{ sale.returned_on|date:"d M Y" }}</h2><p>{{ sale.return_reason|linebreaksbr }}</p></section>
+<section class="card report-card">
+<div class="card-head"><div><h2>Refund</h2><p>{{ sale.refund_status }}</p></div>
+{% if sale.refunded < sale.refund_due %}<a class="button outline small" href="{% url 'record-refund' sale.pk %}">Record refund payment</a>{% endif %}</div>
+{% if sale.refund_due is not None %}<p>Agreed refund GH₵ {{ sale.refund_due|floatformat:"2g" }} · Paid GH₵ {{ sale.refunded|floatformat:"2g" }}</p>{% endif %}
+{% if sale.refunds.exists %}<div class="table-wrap"><table><thead><tr><th>Date recorded</th><th>Reference</th><th>Amount</th></tr></thead><tbody>{% for refund in sale.refunds.all %}<tr><td>{{ refund.date|date:"d M Y" }}</td><td>{{ refund.reference }}</td><td>GH₵ {{ refund.amount|floatformat:"2g" }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+</section>{% else %}<div class="actions record-actions"><a class="button outline small" href="{% url 'return-laptop' sale.pk %}">Record return</a><a class="button outline small" href="{% url 'change' 'sales' sale.pk %}">Edit sale</a><a class="button danger-outline small" data-confirm href="{% url 'delete' 'sales' sale.pk %}">Delete sale</a></div>{% endif %}
+<section class="metrics"><div class="metric primary"><span>Outstanding</span><strong>GH₵ {{ sale.balance|floatformat:"2g" }}</strong><small>{{ sale.status }}</small></div><div class="metric"><span>Cash price</span><strong>GH₵ {{ sale.cash_price|floatformat:"2g" }}</strong></div><div class="metric"><span>Deposit</span><strong>GH₵ {{ sale.deposit|floatformat:"2g" }}</strong></div><div class="metric"><span>Interest</span><strong>GH₵ {{ sale.interest|floatformat:"2g" }}</strong></div></section>
+<section class="card sale-terms"><h2>Agreement terms</h2>
+<dl class="fields profile-fields">
+<div><dt>Sale date</dt><dd>{{ sale.date|date:"d M Y" }}</dd></div>
+<div><dt>Deposit rate</dt><dd>{{ sale.deposit_percent|floatformat:2 }}%</dd></div>
+<div><dt>Term and frequency</dt><dd>{{ sale.days }} days · {{ sale.get_frequency_display }}</dd></div>
+<div><dt>Total to repay after deposit</dt><dd>GH₵ {{ sale.financed|floatformat:"2g" }}</dd></div>
+<div><dt>Scheduled instalment</dt><dd>GH₵ {{ sale.installment|floatformat:"2g" }}</dd></div>
+<div><dt>Next due</dt><dd>{% if sale.returned_on %}Returned{% elif sale.balance %}{{ sale.next_due|date:"d M Y" }}{% else %}Paid in full{% endif %}</dd></div>
+<div><dt>Agreement signed</dt><dd>{{ sale.signed|yesno:"Yes,No" }}</dd></div>
+<div><dt>Sales officer</dt><dd>{{ sale.sales_officer|default:"—" }}</dd></div>
+{% if sale.notes %}<div class="wide"><dt>Notes</dt><dd>{{ sale.notes|linebreaksbr }}</dd></div>{% endif %}
+</dl></section>
+<section class="card" style="margin-bottom:9px"><h2>Cost and profit</h2><div class="table-wrap"><table><thead><tr><th>Laptop cost</th><th>Credit price</th><th>Agreed profit</th><th>Cash collected</th><th>Cash profit</th></tr></thead><tbody><tr><td>GH₵ {{ sale.agreed_cost|floatformat:"2g" }}</td><td>GH₵ {{ sale.credit_price|floatformat:"2g" }}</td><td>GH₵ {{ sale.profit_agreed|floatformat:"2g" }}</td><td>GH₵ {{ sale.cash_collected|floatformat:"2g" }}</td><td>GH₵ {{ sale.cash_profit|floatformat:"2g" }}</td></tr></tbody></table></div></section>
+<section class="card"><h2>Repayments</h2><p>Final due {{ sale.final_due|date:"d M Y" }} · Total repaid GH₵ {{ sale.repaid|floatformat:"2g" }}</p><div class="table-wrap"><table><thead><tr><th>Code</th><th>Date and time</th><th>Method</th><th>Amount</th></tr></thead><tbody>{% for p in payment_page %}<tr><td><a href="{% url 'edit' 'payments' p.pk %}">{{ p.code }}</a></td><td>{{ p.date|date:"d M Y" }}{% if p.time %} · {{ p.time|time:"H:i" }}{% endif %}</td><td>{{ p.method }}</td><td>GH₵ {{ p.amount|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="4" class="empty">No repayments recorded.</td></tr>{% endfor %}</tbody></table></div>{% include "pagination.html" with page_obj=payment_page %}</section>
+{% endblock %}

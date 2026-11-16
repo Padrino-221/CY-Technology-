@@ -1,0 +1,8 @@
+{% if field.field.widget.input_type == "select" %}
+<div class="select-control">{{ field }}{% include "icon.html" with name="caret-down" only %}</div>
+{% elif field.field.widget.input_type == "date" or field.field.widget.input_type == "time" %}
+<div class="picker-control">{{ field }}<button type="button" class="picker-trigger" hidden aria-label="Open {{ field.label|lower }} picker">
+{% if field.field.widget.input_type == "date" %}{% include "icon.html" with name="calendar-blank" only %}
+{% else %}{% include "icon.html" with name="clock" only %}{% endif %}
+</button></div>
+{% else %}{{ field }}{% endif %}

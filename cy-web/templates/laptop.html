@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'records' 'inventory' %}">← Laptop inventory</a>
+<div class="heading entry-heading"><div><span class="eyebrow">LAPTOP DETAILS</span><h1>{{ laptop.brand }} {{ laptop.model }}</h1><p>{{ laptop.code }} · {{ laptop.serial }}</p></div><a class="button outline" href="{% url 'change' 'inventory' laptop.pk %}">Edit laptop</a></div>
+<div class="actions record-actions">
+{% if active_sale %}<a class="button outline small" href="{% url 'edit' 'sales' active_sale.pk %}">View current sale</a><a class="button outline small" href="{% url 'return-laptop' active_sale.pk %}">Record return</a>
+{% elif laptop.needs_inspection %}<form method="post" action="{% url 'release-laptop' laptop.pk %}">{% csrf_token %}<button class="button small" type="submit">Mark ready for resale</button></form>
+{% else %}<a class="button small" href="{% url 'new' 'sales' %}?laptop={{ laptop.pk }}">Create credit sale</a>{% endif %}
+{% if can_delete %}<a class="button danger-outline small" data-confirm href="{% url 'delete' 'inventory' laptop.pk %}">Delete laptop</a>{% endif %}
+</div>
+<div class="product-layout">
+<section class="card product-gallery{% if photos %} product-gallery-filled{% endif %}" aria-label="Laptop photos">
+{% if photos %}
+  <img class="product-main-photo" src="{% url 'laptop-photo' photos.0.pk %}" alt="{{ laptop.brand }} {{ laptop.model }} photo 1" data-gallery-main>
+  {% if photos|length > 1 %}<div class="laptop-thumbnails" aria-label="Select a photo">{% for photo in photos %}<a class="gallery-thumbnail" href="{% url 'laptop-photo' photo.pk %}" data-gallery-photo {% if forloop.first %}aria-current="true"{% endif %}><img src="{% url 'laptop-photo' photo.pk %}" alt="{{ laptop.brand }} {{ laptop.model }} photo {{ forloop.counter }}"></a>{% endfor %}</div>{% endif %}
+{% else %}
+  <div class="product-placeholder">{% include "icon.html" with name="laptop" only %}<p>No photos added</p></div>
+{% endif %}
+</section>
+<section class="card product-info"><span class="pill">{% if active_sale %}Sold{% elif laptop.needs_inspection %}Needs inspection{% else %}In stock{% endif %}</span><span class="product-price">GH₵ {{ laptop.price|floatformat:"2g" }}</span>
+<h2>Description</h2><p>{{ laptop.description|default:"No description added."|linebreaksbr }}</p>
+<h2>Specifications</h2><dl class="fields profile-fields">
+<div><dt>Processor</dt><dd>{{ laptop.processor|default:"—" }}</dd></div><div><dt>Memory</dt><dd>{% if laptop.ram %}{{ laptop.ram }} GB{% else %}—{% endif %}</dd></div><div><dt>Storage</dt><dd>{{ laptop.storage|default:"—" }}</dd></div><div><dt>Screen size</dt><dd>{% if laptop.screen_inches %}{{ laptop.screen_inches }} inches{% else %}—{% endif %}</dd></div><div><dt>Condition</dt><dd>{{ laptop.condition|default:"—" }}</dd></div><div><dt>Warranty</dt><dd>{% if laptop.warranty_months is not None %}{{ laptop.warranty_months }} months{% else %}—{% endif %}</dd></div>
+</dl></section></div>
+{% if sale_history %}<section class="card"><h2>Sale history</h2><div class="table-wrap"><table><thead><tr><th>Agreement</th><th>Sale date</th><th>Status</th></tr></thead><tbody>
+{% for sale in sale_history %}<tr><td><a href="{% url 'edit' 'sales' sale.pk %}">{{ sale.code }}</a></td><td>{{ sale.date|date:"d M Y" }}</td><td>{% if sale.returned_on %}Returned {{ sale.returned_on|date:"d M Y" }}{% else %}Sold{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'edit' 'sales' sale.pk %}">Back to sale</a>
+<div class="heading entry-heading"><div><h1>Return laptop</h1><p>{{ sale.laptop }} · Agreement {{ sale.code }}</p></div></div>
+<form class="card entry" method="post">
+{% csrf_token %}
+<p>Confirm only after receiving the laptop. This closes the agreement and preserves the original deposit and repayments. Choose <strong>Needs inspection</strong> to hold the laptop out of stock.</p>
+<p>Enter the agreed refund in Ghana cedis, or leave it blank if none is due. After sending any refund, record the payment on the returned agreement.</p>
+<div class="fields">{% for field in form %}{% include "entry_field.html" %}{% endfor %}</div>
+<div class="actions form-actions"><button class="button" type="submit">Confirm return</button><a class="button outline" href="{% url 'edit' 'sales' sale.pk %}">Cancel</a></div>
+</form>
+{% endblock %}

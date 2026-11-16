@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><span class="eyebrow">HELP CENTER</span><h1>User manual</h1><p>Learn how to run the front desk and follow a credit agreement from registration to final repayment.</p></div></div>
+<div class="manual-layout">
+<nav class="card manual-index" aria-label="Manual contents">
+  <h2>On this page</h2>
+  <a href="#start">Getting started</a><a href="#dashboard">Dashboard</a><a href="#customers">Customers</a>
+  <a href="#inventory">Laptop inventory</a><a href="#sales">Credit sales</a><a href="#payments">Repayments</a>
+  <a href="#follow-up">Follow-up</a><a href="#profit">Cost and profit</a><a href="#reports">Reports</a>
+  <a href="#search">Search and lists</a><a href="#account">Settings and account</a><a href="#troubleshooting">Troubleshooting</a>
+</nav>
+<div class="manual-content">
+<section class="card" id="start">
+<h2>Getting started</h2>
+<p>Sign in with your front desk username and password. The Dashboard opens after sign-in. Use the sidebar to switch pages and the account menu in the upper right for settings, this manual, password changes, and sign-out.</p>
+<ol class="manual-flow" aria-label="Credit workflow"><li><a href="#customers">Register customer</a></li><li><a href="#inventory">Add laptop</a></li><li><a href="#sales">Create sale</a></li><li><a href="#payments">Record repayment</a></li><li><a href="#reports">Review reports</a></li></ol>
+<p>A sale connects one customer and one laptop. Repayments attach to that sale. Those same records feed the customer’s balance, the follow-up queue, and your sales and profit reports.</p>
+</section>
+<section class="card" id="dashboard">
+<h2>Dashboard</h2>
+<p>The dashboard summarizes outstanding credit, the number of agreements, laptops available for sale, and accounts that need follow-up. Select a card to open its underlying list. The in-stock card opens inventory with the stock filter applied.</p>
+<p>Credit activity shows agreements recorded over the last seven days. Recent sales and the follow-up queue link directly to agreements. Portfolio progress shows the share paid in full. Sales and collections summarize cash value, deposits, repayments, and agreed interest. The profit section summarizes agreed profit, cash profit, and cost recovery.</p>
+<p><a href="{% url 'dashboard' %}">Open Dashboard</a></p>
+</section>
+<section class="card" id="customers">
+<h2>Customers</h2>
+<ol><li>Open Customers and select <strong>New customer</strong>. Enter a unique customer code, full name, and phone number.</li>
+<li>Use <strong>Continue</strong> to move through personal details, education and repayment, guarantor and next of kin, then consent and photo. <strong>Back</strong> keeps entries as you move between steps.</li>
+<li>If you enter a Ghana Card PIN, use the printed format, such as <code>GHA-123456789-0</code>. The app checks the format.</li>
+<li>Choose a photo if needed and select <strong>Save customer</strong> on the last step.</li></ol>
+<p>Select a customer’s name to see their profile, photo, contact information, and credit agreements. The outstanding balance combines that customer’s agreements. Select <strong>Edit info</strong> to update details or replace or remove the photo. A customer linked to a sale is protected from deletion.</p>
+<p><a href="{% url 'records' 'customers' %}">Open Customers</a></p>
+</section>
+<section class="card" id="inventory">
+<h2>Laptop inventory</h2>
+<p>Select <strong>New laptop</strong> and enter the laptop code, brand, model, unique serial number, purchase cost, other costs, and selling price. Add specifications, a description, and product photos as available. Other costs can include transport or repairs. Total cost combines purchase cost and other costs.</p>
+<p>To add several units of the same model, set <strong>Quantity</strong> on the new laptop form. Enter the first serial number in <strong>Serial</strong> and the rest under <strong>Additional serial numbers</strong>, one per line. The app adds numbered suffixes to the code for additional units and tracks each unit separately. You can also add units from <strong>Edit laptop</strong>. Quantity includes the laptop you are editing, so set it to 3 to add two more units.</p>
+<p>Use <strong>All laptops</strong> or <strong>In stock</strong> to switch views. Open a laptop to see its product page. Select a thumbnail to change the main image. Use <strong>Edit laptop</strong> to change details, add up to eight photos, or mark photos for removal and save.</p>
+<p>Saving a credit sale marks the laptop sold and removes it from the available options for new sales. The agreement stores its selling price and cost at the time of the sale. A laptop linked to a sale is protected from deletion.</p>
+<p><a href="{% url 'records' 'inventory' %}">Open Laptop inventory</a></p>
+</section>
+<section class="card" id="sales">
+<h2>Credit sales</h2>
+<ol><li>Select <strong>New sale</strong> and enter a unique sale code. Choose the customer and an available laptop.</li><li>Enter the sale date, deposit percentage, term in days, and repayment frequency. Record whether the agreement is signed and add an officer or notes as needed.</li><li>Save the sale and open its detail page. Check the deposit, interest, scheduled instalment, amount to repay, and due dates.</li></ol>
+<p>Interest is calculated on the original cash price. The total to repay after deposit is cash price plus interest minus deposit. For example, GH₵4,000 with a 70% deposit and 5% interest leaves GH₵1,400 to repay. Use the rates and limits shown on the sale form for the actual agreement.</p>
+<p>The detail page connects the agreement terms, repayments, outstanding balance, and profit. Select <strong>Edit sale</strong> for corrections. Once repayments exist, the financial terms are locked. A sale with repayments is protected from deletion.</p>
+<h3>Return a laptop and track the refund</h3>
+<ol><li>Open the laptop or its agreement and choose <strong>Record return</strong> after receiving the unit.</li>
+<li>Enter a reason and select <strong>Ready for resale</strong> or <strong>Needs inspection</strong>. After inspection, open the laptop and choose <strong>Mark ready for resale</strong>.</li>
+<li>Enter the agreed refund if one is due. Saving closes the balance and preserves the original agreement and repayments. Click a repayment to read its details.</li>
+<li>After sending a refund, open the returned agreement and select <strong>Record refund payment</strong>. Enter the amount and payment reference or receipt number. You can record partial payments until the refund is complete.</li></ol>
+<p>The dashboard shows returned sales collections and refunds separately from the rest of the portfolio.</p>
+<p><a href="{% url 'records' 'sales' %}">Open Credit sales</a></p>
+</section>
+<section class="card" id="payments">
+<h2>Repayments</h2>
+<p>Open a sale and select <strong>Record repayment</strong>, or choose <strong>New payment</strong> in Repayments and select the agreement. Enter a unique payment code, the date, amount, and method. Time, reference, recipient, and notes can help you identify the payment later.</p>
+<p>Use a payment date from the sale date through today. The amount must fit the agreement’s remaining balance. Open a payment from the repayment list or from its agreement to correct it. Editing or deleting a payment recalculates the agreement balance, follow-up status, and cash profit. Full repayment closes the outstanding balance.</p>
+<p><a href="{% url 'records' 'payments' %}">Open Repayments</a></p>
+</section>
+<section class="card" id="follow-up">
+<h2>Follow-up</h2>
+<p>The list shows accounts that are due soon, behind schedule, overdue, or in recovery. Use customer and guarantor contact information to follow up. Open the sale to see its next due date, final due date, and payments. Open the customer name to check their full profile.</p>
+<dl><dt>Due soon</dt><dd>The next due date is within the warning period.</dd><dt>Behind schedule</dt><dd>The next instalment date has passed while the final due date has yet to pass.</dd><dt>Overdue</dt><dd>The final due date has passed.</dd><dt>Recovery</dt><dd>The final due date and the recovery grace period have both passed.</dd></dl>
+<p>Select <strong>Print view</strong> to see all matching records, then select <strong>Print follow-up list</strong> to open your browser’s print options.</p>
+<p><a href="{% url 'records' 'follow-up' %}">Open Follow-up</a></p>
+</section>
+<section class="card" id="profit">
+<h2>Cost and profit</h2>
+<dl><dt>Agreed profit</dt><dd>Agreed credit price minus the laptop cost recorded on the sale.</dd><dt>Cash collected</dt><dd>The deposit plus repayments recorded so far.</dd><dt>Cash profit</dt><dd>Cash collected minus the recorded laptop cost. A negative figure shows how much of the cost is still unrecovered.</dd><dt>Cost recovery</dt><dd>Recovered once the deposit and repayments cover the recorded laptop cost.</dd></dl>
+<p>Open a sale code to reconcile the figures with the agreement and its payment history.</p>
+<p><a href="{% url 'records' 'profit' %}">Open Cost and profit</a></p>
+</section>
+<section class="card" id="reports">
+<h2>Reports</h2>
+<ul><li><strong>Customer balances</strong> groups outstanding credit by customer. Select a name to review the individual agreements.</li><li><strong>Accounts by status</strong> shows the count and outstanding balance for each status.</li><li><strong>Sales by institution</strong> groups agreements by the institution recorded on each customer profile and shows the cash value sold and outstanding credit.</li></ul>
+<p>These reports update as agreements and payments change. Use the links at the top of Reports to open the follow-up list or see profit by sale.</p>
+<p><a href="{% url 'reports' %}">Open Reports</a></p>
+</section>
+<section class="card" id="search">
+<h2>Search and lists</h2>
+<p>Use the header search to look across customers, inventory, sales, and payments. Try a name, record code, phone number, serial number, or payment reference. Results are grouped by record type. Select <strong>View all</strong> to open that group’s filtered list.</p>
+<p>Search within a list to narrow that page. <strong>Clear search</strong> resets the search text. Long lists show 25 records per page. Use <strong>Previous</strong> and <strong>Next</strong> to move between pages while keeping the active search and filters.</p>
+</section>
+<section class="card" id="account">
+<h2>Settings and account</h2>
+<p>Open <strong>Business settings</strong> from the account menu to edit the minimum deposit, maximum term, interest rates for the three term bands, and follow-up timing. New agreements use the saved rates. Existing agreements keep their agreed interest unless the laptop or term is changed before repayments begin. Follow-up timing applies to all open agreements.</p>
+<p>Use <strong>Change password</strong> to enter your current password and confirm a new password of at least 12 characters. You stay signed in after saving. Use <strong>Sign out</strong> when leaving the front desk.</p>
+<p><a href="{% url 'business-settings' %}">Open Business settings</a> · <a href="{% url 'change-password' %}">Change password</a></p>
+</section>
+<section class="card" id="troubleshooting">
+<h2>Troubleshooting</h2>
+<dl><dt>A laptop is missing from the sale form</dt><dd>Check the inventory status. Only available laptops can be selected for a new sale.</dd><dt>A payment will not save</dt><dd>Check its code, the payment date, and the remaining amount on the agreement.</dd><dt>A record cannot be deleted</dt><dd>Check the agreements or repayments linked to it. Edit the original record if you are correcting a detail.</dd><dt>The Windows app does not open</dt><dd>Run <strong>Start.cmd</strong> and keep its window open while using the app. Use the address printed in that window.</dd><dt>You need a backup</dt><dd>On the Windows installation, run <strong>Backup.cmd</strong>. See <strong>CLIENT-SETUP.md</strong> in the installation folder for backup and restore instructions.</dd></dl>
+</section>
+</div></div>
+<section class="card"><h2>Working offline</h2>
+<p>Use the dedicated staff browser and open the pages and forms you expect to need while connected. Revisit them after the first visit so the browser can save them for offline use.</p>
+<p>Submit a form as usual. The status panel shows changes saved on this device and tries to sync them while the app is open. Open <strong>Review values</strong> if a submission needs attention. Check the current server record and re-enter the change if appropriate.</p>
+<p>The server assigns record IDs after syncing. Sync new records before using them in another form, such as selecting a new customer for a sale. Password changes and sign-in require a connection.</p>
+</section>
+{% endblock %}

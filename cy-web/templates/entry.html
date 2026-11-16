@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'records' section %}">{% include "icon.html" with name="arrow-left" only %} Back to records</a><div class="heading entry-heading"><div><h1>{{ title }}</h1><p>Fill in the details below, then save the record.</p></div>{% if record and section == 'customers' %}<a class="button outline" href="{% url 'new' section %}">{% include "icon.html" with name="plus" only %} New customer</a>{% endif %}</div>
+{% if no_available_laptops %}
+<section class="card"><h2>No laptops available for sale</h2><p>Add a laptop or release an inspected laptop before creating a sale.</p><p><a class="back" href="{% url 'records' 'inventory' %}">Open laptop inventory</a></p></section>
+{% else %}
+<form class="card entry" method="post" enctype="multipart/form-data"{% if customer_wizard %} data-wizard{% endif %}>
+{% csrf_token %}{{ form.non_field_errors }}
+{% if section == 'customers' %}<div class="entry-intro">{% if record.photo %}<img class="portrait" src="{% url 'photo' record.pk %}" alt="Customer photo">{% endif %}<div><h2>Customer details</h2><p>Enter the Ghana Card PIN as GHA-123456789-0.</p></div></div>{% endif %}
+{% if section == 'sales' %}<p class="flash">{% if record and form.days.field.disabled %}Financial terms are locked because this sale has repayments. You can still edit the agreement reference, signature status, officer, and notes.{% else %}Minimum deposit {{ form.rules.minimum_deposit|floatformat:-2 }}%. Maximum term {{ form.rules.maximum_term }} days. Interest on the original cash price: {{ form.rules.rate_1_to_30|floatformat:-2 }}% (1–30 days), {{ form.rules.rate_31_to_60|floatformat:-2 }}% (31–60 days), or {{ form.rules.rate_61_to_90|floatformat:-2 }}% (61–90 days).{% endif %}</p>{% endif %}
+{% if customer_groups %}
+{% if customer_wizard %}<div class="wizard-tracker" hidden>
+<p class="wizard-position" role="status" aria-atomic="true"></p>
+<progress class="wizard-meter" aria-label="Registration step" value="1" max="{{ customer_groups|length }}"></progress>
+<ol class="wizard-progress" aria-label="Registration steps">{% for title, fields in customer_groups %}<li><span>{{ forloop.counter }}</span>{{ title }}</li>{% endfor %}</ol></div>{% endif %}
+{% for title, fields in customer_groups %}
+<fieldset class="customer-group" {% if customer_wizard %}data-step{% endif %}>
+<legend tabindex="-1">{{ title }}</legend>
+<div class="fields">{% for field in fields %}{% include "entry_field.html" %}{% endfor %}</div>
+</fieldset>
+{% endfor %}
+{% else %}
+{% if section == "inventory" %}{% if record %}<p>Quantity includes the laptop you’re editing. Enter 3 and provide two additional serial numbers to add two units. New uploads are added to each unit.</p>{% else %}<p>To add multiple units with these details, set the quantity and enter the remaining serial numbers below. Each unit gets its own code and can be sold separately.</p>{% endif %}{% endif %}
+<div class="fields">{% for field in form %}{% if field.name != "gallery_uploads" and field.name != "remove_photos" %}{% include "entry_field.html" %}{% endif %}{% endfor %}</div>
+{% if section == "inventory" %}
+{% include "laptop_gallery_fields.html" %}
+{% endif %}
+{% endif %}
+<div class="actions form-actions">{% if customer_wizard %}<button type="button" class="button outline" data-back hidden>Back</button><button type="button" class="button" data-next hidden>Continue</button>{% endif %}<button class="button" type="submit" data-save>Save {{ singular }}</button><a class="button outline" href="{% if record and section == 'customers' or record and section == 'inventory' %}{% url 'edit' section record.pk %}{% else %}{% url 'records' section %}{% endif %}">Cancel</a>{% if can_delete %}<a class="button danger-outline" data-confirm href="{% url 'delete' section record.pk %}">Delete {{ singular }}</a>{% endif %}</div></form>
+{% endif %}
+{% endblock %}

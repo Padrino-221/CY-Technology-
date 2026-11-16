@@ -1,0 +1,10 @@
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="{{ pagination_label|default:'Table pages' }}">
+  <span>{{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+  <div class="actions">
+    {% if page_obj.has_previous %}<a class="button outline small" href="{{ page_obj.previous_url }}">Previous</a>{% endif %}
+    <span aria-current="page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="button outline small" href="{{ page_obj.next_url }}">Next</a>{% endif %}
+  </div>
+</nav>
+{% endif %}

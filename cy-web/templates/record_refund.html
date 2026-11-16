@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'edit' 'sales' sale.pk %}">Back to sale</a>
+<div class="heading entry-heading"><div><h1>Record refund payment</h1><p>{{ sale.code }} · GH₵ {{ remaining|floatformat:"2g" }} still due</p></div></div>
+<form class="card entry" method="post">
+{% csrf_token %}{{ form.non_field_errors }}
+<p>Enter the amount in Ghana cedis after sending the refund. Use the receipt number for cash refunds.</p>
+<div class="fields">{% for field in form %}{% include "entry_field.html" %}{% endfor %}</div>
+<div class="actions form-actions"><button type="submit" class="button">Save refund payment</button><a class="button outline" href="{% url 'edit' 'sales' sale.pk %}">Cancel</a></div>
+</form>
+{% endblock %}

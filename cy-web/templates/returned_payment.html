@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block workspace %}
+<a class="back entry-back" href="{% url 'edit' 'sales' payment.sale_id %}">Back to agreement {{ payment.sale.code }}</a>
+<div class="heading entry-heading"><div><h1>Repayment {{ payment.code }}</h1><p>{{ payment.sale.customer }} · Returned agreement</p></div></div>
+<section class="card">
+<dl class="fields profile-fields">
+<div><dt>Amount</dt><dd>GH₵ {{ payment.amount|floatformat:"2g" }}</dd></div>
+<div><dt>Date and time</dt><dd>{{ payment.date|date:"d M Y" }} {% if payment.time %}{{ payment.time|time:"H:i" }}{% endif %}</dd></div>
+<div><dt>Method</dt><dd>{{ payment.method }}</dd></div>
+<div><dt>Reference</dt><dd>{{ payment.reference|default:"—" }}</dd></div>
+<div><dt>Received by</dt><dd>{{ payment.received_by|default:"—" }}</dd></div>
+<div class="wide"><dt>Notes</dt><dd>{{ payment.notes|default:"—"|linebreaksbr }}</dd></div>
+</dl></section>
+{% endblock %}

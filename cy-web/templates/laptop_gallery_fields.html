@@ -1,0 +1,6 @@
+<fieldset class="customer-group laptop-photo-fields"><legend>Product gallery</legend>
+{% if laptop_photos %}<div class="laptop-thumbnails">{% for photo in laptop_photos %}<label class="gallery-remove"><img src="{% url 'laptop-photo' photo.pk %}" alt="Laptop photo {{ forloop.counter }}"><span><input type="checkbox" name="remove_photos" value="{{ photo.pk }}"> Remove</span></label>{% endfor %}</div>{% endif %}
+{{ form.remove_photos.errors }}
+<div class="field"><div class="upload-control"><input class="upload-source" type="file" name="gallery_uploads" id="id_gallery_uploads" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp" multiple aria-describedby="laptop-photo-help">
+<label class="upload-trigger" for="id_gallery_uploads">{% include "icon.html" with name="upload-simple" only %}<span><strong>Add laptop photos</strong><small id="laptop-photo-help" aria-live="polite">Up to eight photos, 7 MB per upload</small></span></label></div>{{ form.gallery_uploads.errors }}</div>
+</fieldset>

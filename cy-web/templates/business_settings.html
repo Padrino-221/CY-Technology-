@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><span class="eyebrow">WORKSPACE</span><h1>Business settings</h1><p>Configure credit terms and follow-up timing.</p></div></div>
+<form method="post" class="card entry">
+  {% csrf_token %}{{ form.non_field_errors }}
+  <p class="flash">New agreements use the current rates. Saved interest amounts stay as agreed unless the laptop or term is changed before a repayment. Follow-up timing applies to all open agreements.</p>
+  <fieldset class="customer-group"><legend>Credit rules</legend><div class="fields">
+    {% for field in form %}{% if field.name != "due_soon_days" and field.name != "recovery_grace_days" %}{% include "entry_field.html" %}{% endif %}{% endfor %}
+  </div></fieldset>
+  <fieldset class="customer-group"><legend>Follow-up rules</legend><div class="fields">
+    {% for field in form %}{% if field.name == "due_soon_days" or field.name == "recovery_grace_days" %}{% include "entry_field.html" %}{% endif %}{% endfor %}
+  </div></fieldset>
+  <div class="actions form-actions"><button class="button" type="submit">Save settings</button><a class="button outline" href="{% url 'dashboard' %}">Cancel</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block page_title %}{{ title|default:"Dashboard" }}{% endblock %} · CY Technologies</title>
+<link rel="icon" type="image/png" href="{% static 'company-logo.png' %}">
+<link rel="stylesheet" href="{% static 'app.css' %}?v=gauge-1"></head><body>
+{% if user.is_authenticated %}
+<div class="shell">
+<aside class="sidebar">
+<a href="{% url 'dashboard' %}" class="brand"><span class="brand-logo"><img src="{% static 'company-logo.png' %}" alt="" width="38" height="38"></span><span>CY Technologies<small>Credit Manager</small></span></a>
+<p class="nav-label">WORKSPACE</p>
+<nav aria-label="Workspace">
+<a class="{% if section == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">{% include "icon.html" with name="squares-four" only %} Dashboard</a>
+<a class="{% if section == 'customers' %}active{% endif %}" href="{% url 'records' 'customers' %}">{% include "icon.html" with name="users" only %} Customers</a>
+<a class="{% if section == 'inventory' %}active{% endif %}" href="{% url 'records' 'inventory' %}">{% include "icon.html" with name="laptop" only %} Laptop inventory</a>
+<a class="{% if section == 'sales' %}active{% endif %}" href="{% url 'records' 'sales' %}">{% include "icon.html" with name="receipt" only %} Credit sales</a>
+<a class="{% if section == 'payments' %}active{% endif %}" href="{% url 'records' 'payments' %}">{% include "icon.html" with name="wallet" only %} Repayments</a>
+<a class="{% if section == 'follow-up' %}active{% endif %}" href="{% url 'records' 'follow-up' %}">{% include "icon.html" with name="clock" only %} Follow-up</a>
+<a class="{% if section == 'profit' %}active{% endif %}" href="{% url 'records' 'profit' %}">{% include "icon.html" with name="trend-up" only %} Cost &amp; profit</a>
+<a class="{% if section == 'reports' %}active{% endif %}" href="{% url 'reports' %}">{% include "icon.html" with name="chart-bar" only %} Reports</a>
+</nav>
+</aside>
+<div class="workspace">
+<header class="topbar"><form class="search" role="search" action="{% url 'search' %}">{% include "icon.html" with name="magnifying-glass" only %}<input type="search" name="q" value="{{ request.GET.q|default:'' }}" aria-label="Search all records" placeholder="Search all records…" required><button class="quiet" type="submit">Search</button></form>
+<details class="account-menu">
+  <summary class="account-trigger">
+    <span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span>
+    <span class="account-name">{{ user.get_short_name|default:user.username }}</span>
+    {% include "icon.html" with name="caret-down" icon_class="account-chevron" only %}
+  </summary>
+  <div class="account-panel">
+    <div class="account-meta"><strong>{{ user.get_short_name|default:user.username }}</strong><span class="pill">Front desk</span></div>
+    <a class="account-signout" href="{% url 'business-settings' %}">{% include "icon.html" with name="sliders-horizontal" only %} Business settings</a>
+    <a class="account-signout" href="{% url 'change-password' %}">{% include "icon.html" with name="lock" only %} Change password</a>
+    <a class="account-signout" href="{% url 'user-manual' %}">{% include "icon.html" with name="book-open" only %} User manual</a>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="account-signout">{% include "icon.html" with name="sign-out" only %} Sign out</button></form>
+  </div>
+</details></header>
+<main>{% block workspace %}{% endblock %}</main>
+{% if messages %}<div class="toasts" aria-label="Notifications">{% for message in messages %}<div class="toast {{ message.tags }}" role="{% if message.level >= 40 %}alert{% else %}status{% endif %}"><span>{{ message }}</span><button type="button" class="quiet" data-dismiss hidden aria-label="Dismiss notification">×</button></div>{% endfor %}</div>{% endif %}
+<dialog id="confirm-delete" class="confirm-dialog" aria-labelledby="confirm-title">
+  <h2 id="confirm-title">Delete this record?</h2>
+  <p>This action permanently removes the record.</p>
+  <form method="post" class="actions">{% csrf_token %}<button type="button" class="button outline" data-cancel autofocus>Cancel</button><button type="submit" class="button danger">Delete record</button></form>
+</dialog>
+{% if user.is_authenticated %}
+<aside class="card" data-offline-user="{{ user.pk }}" data-revision="{{ request.offline_revision|default:0 }}" hidden>
+  <p role="status"></p>
+  <button class="button outline small" type="button">Sync now</button>
+  <ul></ul>
+</aside>
+<script src="{% static 'offline.js' %}?v=1" defer></script>
+{% endif %}
+<script src="{% static 'components.js' %}?v=wizard-1" defer></script>
+</div></div>
+{% else %}{% block public %}{% endblock %}{% endif %}
+</body></html>

@@ -1,0 +1,6 @@
+<div class="field {% if field.name == 'notes' or field.name == 'description' %}wide{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>{% if field.name == 'photo' %}<div class="upload-control">
+<input class="upload-source" type="file" name="photo" id="{{ field.id_for_label }}" accept="image/*" aria-describedby="photo-file-name">
+<label class="upload-trigger" for="{{ field.id_for_label }}">
+{% include "icon.html" with name="upload-simple" only %}
+<span><strong>Choose photo</strong><small id="photo-file-name" aria-live="polite">Image file up to 5 MB</small></span>
+</label></div>{% if record.photo %}<label class="photo-clear"><input type="checkbox" name="photo-clear" value="on"> Remove current photo</label>{% endif %}{% else %}{% include "field_widget.html" %}{% endif %}{{ field.errors }}</div>

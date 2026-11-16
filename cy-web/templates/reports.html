@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block workspace %}
+<div class="heading"><div><span class="eyebrow">PORTFOLIO</span><h1>Reports</h1><p>Review customer balances, agreement status, and sales by institution.</p></div><div class="actions"><a class="button outline" href="{% url 'records' 'follow-up' %}">Follow-up list</a><a class="button outline" href="{% url 'records' 'profit' %}">Cost and profit</a></div></div>
+<section class="card report-card"><h2>Customer balances</h2><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Credit agreements</th><th>Outstanding</th></tr></thead><tbody>
+{% for customer, totals in balances %}<tr><td><a href="{% url 'edit' 'customers' customer.pk %}">{{ customer }}</a></td><td>{{ customer.phone }}</td><td>{{ totals.0 }}</td><td>GH₵ {{ totals.2|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="4" class="empty">No credit agreements.</td></tr>{% endfor %}
+</tbody></table></div>{% include "pagination.html" with page_obj=balances pagination_label="Balances pages" %}</section>
+<section class="card report-card"><h2>Accounts by status</h2><div class="table-wrap"><table><thead><tr><th>Status</th><th>Accounts</th><th>Outstanding</th></tr></thead><tbody>
+{% for status, totals in statuses %}<tr><td>{{ status }}</td><td>{{ totals.0 }}</td><td>GH₵ {{ totals.2|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="3" class="empty">No credit agreements.</td></tr>{% endfor %}
+</tbody></table></div>{% include "pagination.html" with page_obj=statuses pagination_label="Statuses pages" %}</section>
+<section class="card report-card"><h2>Sales by institution</h2><div class="table-wrap"><table><thead><tr><th>Institution</th><th>Credit agreements</th><th>Cash value sold</th><th>Outstanding</th></tr></thead><tbody>
+{% for institution, totals in institutions %}<tr><td>{{ institution }}</td><td>{{ totals.0 }}</td><td>GH₵ {{ totals.1|floatformat:"2g" }}</td><td>GH₵ {{ totals.2|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="4" class="empty">No credit agreements.</td></tr>{% endfor %}
+</tbody></table></div>{% include "pagination.html" with page_obj=institutions pagination_label="Institutions pages" %}</section>
+{% endblock %}
