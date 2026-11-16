@@ -1,12 +1,15 @@
 from collections import Counter, defaultdict
 from contextlib import nullcontext
 from datetime import timedelta
+from io import BytesIO
+from pathlib import Path
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.db.models import Exists, OuterRef, Q, Sum, Value
@@ -16,7 +19,7 @@ from django.http import FileResponse, Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.timezone import localdate
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .models import BusinessSettings, Customer, Laptop, LaptopPhoto, Payment, Refund, Sale
 
@@ -298,6 +301,28 @@ CUSTOMER_GROUPS = (
 )
 
 
+def optimize_photo(upload, max_edge):
+    """Resize still photos and use WebP when it saves bytes or reduces dimensions."""
+    try:
+        upload.seek(0)
+        with Image.open(upload) as original:
+            if getattr(original, "is_animated", False):
+                return upload
+            photo = ImageOps.exif_transpose(original)
+            resized = max(photo.size) > max_edge
+            photo.thumbnail((max_edge, max_edge), Image.Resampling.LANCZOS)
+            mode = "RGBA" if photo.has_transparency_data else "RGB"
+            buffer = BytesIO()
+            photo.convert(mode).save(buffer, format="WEBP", quality=82)
+        if resized or buffer.tell() < upload.size:
+            return SimpleUploadedFile(Path(upload.name).stem + ".webp", buffer.getvalue(), "image/webp")
+        return upload
+    except (OSError, ValueError, Image.DecompressionBombError) as exc:
+        raise forms.ValidationError("This photo could not be processed. Choose another image.") from exc
+    finally:
+        upload.seek(0)
+
+
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
@@ -318,6 +343,7 @@ class CustomerForm(forms.ModelForm):
                 raise forms.ValidationError(f"Choose an image no larger than {limit // 1_000_000} MB.")
             if image.image.format not in PHOTO_TYPES:
                 raise forms.ValidationError("Choose a JPEG, PNG, GIF, BMP, or WebP photo.")
+            return optimize_photo(image, 1024)
         return image
 
 
@@ -338,7 +364,7 @@ class MultiPhotoField(forms.ImageField):
         images = [clean_image(file) for file in data]
         if any(image.image.format not in PHOTO_TYPES for image in images):
             raise forms.ValidationError("Choose JPEG, PNG, GIF, BMP, or WebP photos.")
-        return images
+        return [optimize_photo(image, 1600) for image in images]
 
 
 class LaptopForm(forms.ModelForm):

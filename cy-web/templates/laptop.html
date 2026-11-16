@@ -12,7 +12,7 @@
 <section class="card product-gallery{% if photos %} product-gallery-filled{% endif %}" aria-label="Laptop photos">
 {% if photos %}
   <img class="product-main-photo" src="{% url 'laptop-photo' photos.0.pk %}" alt="{{ laptop.brand }} {{ laptop.model }} photo 1" data-gallery-main>
-  {% if photos|length > 1 %}<div class="laptop-thumbnails" aria-label="Select a photo">{% for photo in photos %}<a class="gallery-thumbnail" href="{% url 'laptop-photo' photo.pk %}" data-gallery-photo {% if forloop.first %}aria-current="true"{% endif %}><img src="{% url 'laptop-photo' photo.pk %}" alt="{{ laptop.brand }} {{ laptop.model }} photo {{ forloop.counter }}"></a>{% endfor %}</div>{% endif %}
+  {% if photos|length > 1 %}<div class="laptop-thumbnails" aria-label="Select a photo">{% for photo in photos %}<a class="gallery-thumbnail" href="{% url 'laptop-photo' photo.pk %}" data-gallery-photo {% if forloop.first %}aria-current="true"{% endif %}><img loading="lazy" decoding="async" src="{% url 'laptop-photo' photo.pk %}" alt="{{ laptop.brand }} {{ laptop.model }} photo {{ forloop.counter }}"></a>{% endfor %}</div>{% endif %}
 {% else %}
   <div class="product-placeholder">{% include "icon.html" with name="laptop" only %}<p>No photos added</p></div>
 {% endif %}

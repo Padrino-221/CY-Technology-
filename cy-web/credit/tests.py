@@ -201,7 +201,7 @@ class CreditWorkflowTests(TestCase):
                     "institution": "Demo College", "next_of_kin_name": "Example Contact"}
             self.assertContains(self.client.post("/customers/new/", data | {"ghana_card": "incorrect"}), "Enter the PIN as")
             image = BytesIO()
-            Image.new("RGB", (2, 2)).save(image, format="PNG")
+            Image.new("RGB", (2048, 1024)).save(image, format="PNG")
             # Reject an image with an unsafe extension.
             photo = SimpleUploadedFile("photo.html", image.getvalue(), content_type="image/png")
             rejected = self.client.post("/customers/new/", data | {"photo": photo})
@@ -218,7 +218,11 @@ class CreditWorkflowTests(TestCase):
             url = reverse("photo", args=[customer.pk])
             self.assertEqual(Client().get(url).status_code, 302)
             response = self.client.get(url)
-            self.assertEqual(response.headers["Content-Type"], "image/png")
+            payload = b"".join(response.streaming_content)
+            self.assertEqual(response.headers["Content-Type"], "image/webp")
+            self.assertLess(len(payload), len(image.getvalue()))
+            with Image.open(BytesIO(payload)) as optimized:
+                self.assertEqual(optimized.size, (1024, 512))
             response.close()
             self.assertContains(self.client.get("/search/", {"q": "fictional college"}), "Fictional Person")
             self.assertContains(self.client.get("/search/", {"q": "not-a-match"}), "No matching records")
@@ -268,7 +272,7 @@ class CreditWorkflowTests(TestCase):
     def test_laptop_product_page_and_gallery(self):
         with TemporaryDirectory() as media, self.settings(MEDIA_ROOT=media):
             image = BytesIO()
-            Image.new("RGB", (3, 3)).save(image, format="PNG")
+            Image.new("RGB", (2400, 1200)).save(image, format="PNG")
             files = [SimpleUploadedFile(name, image.getvalue(), content_type="image/png")
                      for name in ("front.png", "side.png")]
             data = {
@@ -287,7 +291,11 @@ class CreditWorkflowTests(TestCase):
             photo_url = reverse("laptop-photo", args=[first.pk])
             self.assertEqual(Client().get(photo_url).status_code, 302)
             response = self.client.get(photo_url)
-            self.assertEqual(response.headers["Content-Type"], "image/png")
+            payload = b"".join(response.streaming_content)
+            self.assertEqual(response.headers["Content-Type"], "image/webp")
+            self.assertLess(len(payload), len(image.getvalue()))
+            with Image.open(BytesIO(payload)) as optimized:
+                self.assertEqual(optimized.size, (1600, 800))
             response.close()
             edit = reverse("change", args=["inventory", laptop.pk])
             self.assertContains(self.client.get(edit), "Save laptop")
