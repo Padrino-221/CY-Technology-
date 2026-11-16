@@ -311,6 +311,8 @@ class CustomerForm(forms.ModelForm):
     def clean_photo(self):
         image = self.cleaned_data["photo"]
         if image and hasattr(image, "image"):
+            if not getattr(settings, "CY_PHOTO_STORAGE_ENABLED", True):
+                raise forms.ValidationError("Photo uploads are unavailable until storage is connected.")
             limit = getattr(settings, "CY_PHOTO_UPLOAD_LIMIT", 5 * 1024 * 1024)
             if image.size > limit:
                 raise forms.ValidationError(f"Choose an image no larger than {limit // 1_000_000} MB.")
@@ -327,6 +329,8 @@ class MultiPhotoField(forms.ImageField):
     def clean(self, data, initial=None):
         if not data:
             return []
+        if not getattr(settings, "CY_PHOTO_STORAGE_ENABLED", True):
+            raise forms.ValidationError("Photo uploads are unavailable until storage is connected.")
         limit = getattr(settings, "CY_PHOTO_UPLOAD_LIMIT", 7 * 1024 * 1024)
         if len(data) > 8 or sum(file.size for file in data) > limit:
             raise forms.ValidationError(f"Choose up to eight photos with a combined size of {limit // 1_000_000} MB or less.")

@@ -35,13 +35,16 @@ MIDDLEWARE = [*MIDDLEWARE, "django.middleware.clickjacking.XFrameOptionsMiddlewa
 
 STATIC_ROOT = BASE_DIR / "staticfiles"  # noqa: F405
 CY_PHOTO_UPLOAD_LIMIT = 4_000_000
+CY_PHOTO_STORAGE_ENABLED = all(os.getenv(name) for name in (
+    "CY_S3_BUCKET", "CY_S3_ACCESS_KEY_ID", "CY_S3_SECRET_ACCESS_KEY",
+))
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "access_key": os.environ["CY_S3_ACCESS_KEY_ID"],
-            "secret_key": os.environ["CY_S3_SECRET_ACCESS_KEY"],
-            "bucket_name": os.environ["CY_S3_BUCKET"],
+            "access_key": os.getenv("CY_S3_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("CY_S3_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("CY_S3_BUCKET"),
             "endpoint_url": os.getenv("CY_S3_ENDPOINT_URL"),
             "region_name": os.getenv("CY_S3_REGION"),
             "signature_version": "s3v4",
@@ -51,3 +54,6 @@ STORAGES = {
     },
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
+
+if not CY_PHOTO_STORAGE_ENABLED:
+    STORAGES["default"] = {"BACKEND": "credit.storage.DisabledPhotoStorage"}

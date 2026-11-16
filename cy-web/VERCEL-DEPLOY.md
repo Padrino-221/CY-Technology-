@@ -1,7 +1,7 @@
 # Deploy Credit Manager on Vercel
 
 1. Push these changes to GitHub and import the repository in Vercel. Set **Root Directory** to `cy-web` and select **Django** if Vercel asks for a framework. Leave build and output overrides unset. Vercel discovers `manage.py` and the WSGI entry point, then collects static files.
-2. Provision PostgreSQL and a **private** S3-compatible bucket. Give the app a credential scoped to listing and reading, writing, and deleting objects in that bucket. Use independent databases and buckets for previews that need to run.
+2. Provision PostgreSQL. Photo uploads are optional at launch. To enable them, provision a **private** S3-compatible bucket and set the `CY_S3_*` variables, then redeploy. Give the app a credential scoped to listing and reading, writing, and deleting objects in that bucket. Use independent databases and buckets for previews that need to run.
 3. Set the following environment variables in Vercel and in the shell used for database setup. Keep values out of source control.
 
 | Variable | Value |
