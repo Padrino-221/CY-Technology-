@@ -34,7 +34,7 @@ class CreditWorkflowTests(TestCase):
     def test_sale_boundaries_and_stock(self):
         for term, expected in ((1, ".05"), (30, ".05"), (31, ".10"), (60, ".10"), (61, ".20"), (90, ".20")):
             self.assertEqual(credit_rate(term), Decimal(expected))
-        for overrides in ({"days": "0"}, {"days": "91"}, {"deposit_percent": "69.99"},
+        for overrides in ({"days": "0"}, {"days": "91"}, {"deposit_percent": "59.99"},
                           {"deposit_percent": "100.01"}, {"date": self.today + timedelta(days=1)}):
             self.assertEqual(self.create_sale(**overrides).status_code, 200)
         self.assertFalse(Sale.objects.exists())

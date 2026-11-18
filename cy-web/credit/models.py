@@ -8,7 +8,7 @@ from django.utils.timezone import localdate
 
 card_format = RegexValidator(r"^GHA-[0-9]{9}-[0-9]\Z", "Enter the PIN as GHA-123456789-0.", flags=2)
 positive = MinValueValidator(Decimal("0.01"))
-MIN_DEPOSIT = 70
+MIN_DEPOSIT = 60
 MAX_TERM = 90
 DUE_SOON_DAYS = 3
 RECOVERY_GRACE_DAYS = 14
