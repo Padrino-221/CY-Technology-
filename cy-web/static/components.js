@@ -339,3 +339,24 @@ document.querySelectorAll(".product-gallery").forEach((gallery) => {
         });
     });
 });
+
+
+document.querySelectorAll("form[data-upload-limit]").forEach(form => {
+    form.addEventListener("submit", event => {
+        const inputs = [...form.querySelectorAll('input[type="file"]')];
+        const size = inputs.flatMap(input => [...input.files])
+            .reduce((total, file) => total + file.size, 0);
+        const input = inputs[0];
+        if (input) input.setCustomValidity("");
+        if (input && size > Number(form.dataset.uploadLimit)) {
+            event.preventDefault();
+            input.setCustomValidity("Choose photos totaling 4 MB or less per submission.");
+            input.reportValidity();
+        }
+    });
+    form.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener("change", () => {
+            form.querySelector('input[type="file"]').setCustomValidity("");
+        });
+    });
+});

@@ -280,13 +280,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return self.code
-
-
-class OfflineRevision(models.Model):
-    version = models.PositiveBigIntegerField(default=0)
-
-
-class OfflineReceipt(models.Model):
-    id = models.UUIDField(primary_key=True)
-    user_id = models.PositiveBigIntegerField()
-    version = models.PositiveBigIntegerField()

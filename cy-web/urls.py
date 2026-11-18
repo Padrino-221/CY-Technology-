@@ -7,7 +7,6 @@ import offline
 
 urlpatterns = [
     path("offline-worker.js", offline.worker),
-    path("offline-session/", offline.session),
     path("", views.dashboard, name="dashboard"),
     path("account/password/", views.AccountPasswordChangeView.as_view(), name="change-password"),
     path("settings/", views.business_settings, name="business-settings"),

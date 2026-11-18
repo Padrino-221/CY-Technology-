@@ -42,15 +42,8 @@
   <p>This action permanently removes the record.</p>
   <form method="post" class="actions">{% csrf_token %}<button type="button" class="button outline" data-cancel autofocus>Cancel</button><button type="submit" class="button danger">Delete record</button></form>
 </dialog>
-{% if user.is_authenticated %}
-<aside class="card" data-offline-user="{{ user.pk }}" data-revision="{{ request.offline_revision|default:0 }}" hidden>
-  <p role="status"></p>
-  <button class="button outline small" type="button">Sync now</button>
-  <ul></ul>
-</aside>
-<script src="{% static 'offline.js' %}?v=2" defer></script>
-{% endif %}
 <script src="{% static 'components.js' %}?v=wizard-1" defer></script>
 </div></div>
 {% else %}{% block public %}{% endblock %}{% endif %}
+<script src="{% static 'offline-cleanup.js' %}" defer></script>
 </body></html>

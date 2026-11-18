@@ -79,30 +79,6 @@ class CreditWorkflowTests(TestCase):
         self.client.post(reverse("delete", args=["sales", sale.pk]))
         self.assertContains(self.client.get("/inventory/?stock=1"), self.laptop.serial)
 
-    def test_offline_replay_deduplication_and_conflict(self):
-        from uuid import uuid4
-
-        csrf_client = Client(enforce_csrf_checks=True)
-        csrf_client.force_login(self.user)
-        session = csrf_client.get("/offline-session/").json()
-        page = csrf_client.get("/inventory/new/")
-        self.assertEqual(page["X-CY-Offline-Page"], session["user"])
-        headers = {
-            "X-CSRFToken": session["csrf"], "X-CY-User": session["user"],
-            "X-CY-Operation": str(uuid4()), "X-CY-Revision": "0",
-        }
-        data = {
-            "code": "OFFLINE-L", "serial": "OFFLINE-SERIAL", "brand": "Example", "model": "Laptop",
-            "cost": "100", "other_costs": "0", "price": "200",
-        }
-        first = csrf_client.post("/inventory/new/", data, headers=headers)
-        self.assertEqual(first.status_code, 200)
-        retry = csrf_client.post("/inventory/new/", data, headers=headers)
-        self.assertEqual(retry.json()["revision"], first.json()["revision"])
-        stale = csrf_client.post("/inventory/new/", data, headers=headers | {"X-CY-Operation": str(uuid4())})
-        self.assertEqual(stale.status_code, 409)
-        self.assertEqual(Laptop.objects.filter(code="OFFLINE-L").count(), 1)
-
     def test_add_multiple_laptop_units(self):
         details = {
             "code": "BATCH", "brand": "Example", "model": "Laptop", "serial": "UNIT-1",
