@@ -18,6 +18,7 @@
 </tbody></table></div></section>
 <section class="card progress"><div class="card-head"><div><h2>Portfolio progress</h2><p>Share of agreements paid in full</p></div></div><div class="gauge" style="--progress:{{ progress }}%"><div><strong>{{ progress }}%</strong><small>Paid in full</small></div></div><p class="legend">● Paid in full <span>◌ Open accounts</span></p></section>
 </div>
+{% include "profit_summary.html" %}
 <section class="card" style="margin-top:9px">
 <div class="card-head"><div><h2>Cost and profit</h2><p>Agreed margin and cash recovered so far</p></div><a class="button outline small" href="{% url 'records' 'profit' %}">View by sale</a></div>
 <div class="table-wrap"><table><thead><tr><th>Laptop cost</th><th>Agreed profit</th><th>Cash profit</th><th>Sales with unrecovered cost</th></tr></thead><tbody><tr><td>GH₵ {{ cost_total|floatformat:"2g" }}</td><td>GH₵ {{ profit_agreed|floatformat:"2g" }}</td><td>GH₵ {{ cash_profit|floatformat:"2g" }}</td><td>{{ cost_unrecovered }}</td></tr></tbody></table></div>

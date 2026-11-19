@@ -1,0 +1,7 @@
+<section class="card report-card" aria-label="Profit summary">
+<div class="card-head"><div><h2>Profit overview</h2><p>Sold laptops, excluding returned agreements. Figures are before general business expenses.</p></div></div>
+<div class="metrics">
+<div class="metric primary"><span>Profit after all debts are settled</span><strong>GH₵ {{ profit_summary.expected|floatformat:"2g" }}</strong><small>Total agreed selling value, including interest, minus laptop costs.</small></div>
+<div class="metric"><span>Profit from collections so far</span><strong>GH₵ {{ profit_summary.collected|floatformat:"2g" }}</strong><small>Deposits and repayments received minus the full cost of sold laptops. This can be negative while debts remain.</small></div>
+<div class="metric"><span>Customer debts remaining</span><strong>GH₵ {{ profit_summary.outstanding|floatformat:"2g" }}</strong><small>{{ profit_summary.open_accounts }} agreement{{ profit_summary.open_accounts|pluralize }} with a balance.</small></div>
+</div></section>

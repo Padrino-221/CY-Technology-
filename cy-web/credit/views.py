@@ -99,6 +99,7 @@ def dashboard(request):
     followups = sorted((sale for sale in agreements if sale.status in FOLLOW_UP), key=lambda sale: (sale.next_due, sale.pk))
     paid = sum(sale.status == "Paid in full" for sale in agreements)
     return render(request, "dashboard.html", {
+        "profit_summary": profit_summary(agreements),
         "section": "dashboard", "agreements": agreements[:5], "followups": followups[:4],
         "outstanding": sum(sale.balance for sale in agreements),
         "profit_agreed": sum(sale.profit_agreed for sale in agreements),
@@ -119,6 +120,16 @@ def dashboard(request):
         "bars": [(day.strftime("%a"), counts[day], round(100 * counts[day] / maximum)) for day in days],
         "today": today,
     })
+
+
+def profit_summary(agreements):
+    active = [sale for sale in agreements if not sale.returned_on]
+    return {
+        "expected": sum(sale.profit_agreed for sale in active),
+        "collected": sum(sale.cash_profit for sale in active),
+        "outstanding": sum(sale.balance for sale in active),
+        "open_accounts": sum(bool(sale.balance) for sale in active),
+    }
 
 
 def section_info(section):
@@ -159,6 +170,7 @@ def search(request):
 def records(request, section):
     model, title, singular, search_fields = section_info(section)
     rows = sales() if model is Sale else model.objects.order_by("-pk")
+    summary = profit_summary(rows) if section == "profit" else None
     stock_only = section == "inventory" and request.GET.get("stock") == "1"
     if model is Laptop:
         rows = stock().order_by("-pk")
@@ -174,6 +186,7 @@ def records(request, section):
         rows = sorted((sale for sale in rows if sale.status in FOLLOW_UP), key=lambda sale: (sale.next_due, sale.pk))
     print_view = section == "follow-up" and request.GET.get("print") == "1"
     return render(request, "records.html", {
+        "profit_summary": summary,
         "section": section, "title": title, "singular": singular, "rows": rows if print_view else paginate(request, rows), "print_view": print_view, "query": query, "stock_only": stock_only,
     })
 
@@ -182,7 +195,7 @@ def records(request, section):
 def reports(request):
     agreements = list(sales().filter(returned_on__isnull=True))
     return render(request, "reports.html", {
-        "title": "Reports", "section": "reports",
+        "title": "Reports", "section": "reports", "profit_summary": profit_summary(agreements),
         "balances": paginate(request, report_totals(agreements, lambda sale: sale.customer), "balances_page"),
         "statuses": paginate(request, report_totals(agreements, lambda sale: sale.status), "statuses_page"),
         "institutions": paginate(request, report_totals(agreements, lambda sale: sale.customer.institution.strip() or "Not recorded"), "institutions_page"),

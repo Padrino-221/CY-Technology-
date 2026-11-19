@@ -157,6 +157,24 @@ class CreditWorkflowTests(TestCase):
         self.assertNotContains(self.client.get("/inventory/?stock=1"), self.laptop.serial)
         self.assertEqual(self.laptop.sale_history.count(), 2)
 
+    def test_profit_summary_collections_and_settlement(self):
+        from .views import profit_summary
+
+        self.create_sale()
+        sale = Sale.objects.get()
+        summary = profit_summary([sale])
+        self.assertEqual(summary["expected"], Decimal("2000"))
+        self.assertEqual(summary["collected"], Decimal("600"))
+        self.assertEqual(summary["outstanding"], Decimal("1400"))
+        for url in ("/", "/reports/", "/profit/"):
+            self.assertContains(self.client.get(url), "Profit after all debts are settled")
+        Payment.objects.create(code="SETTLE", sale=sale, amount=1400, method="Cash")
+        summary = profit_summary([sale])
+        self.assertEqual(summary["expected"], summary["collected"])
+        self.assertEqual(summary["outstanding"], 0)
+        sale.returned_on = self.today
+        self.assertEqual(profit_summary([sale])["expected"], 0)
+
     def test_follow_up_boundary_and_reports(self):
         self.create_sale(date=self.today - timedelta(days=44))
         sale = Sale.objects.get()

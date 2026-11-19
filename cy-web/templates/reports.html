@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block workspace %}
 <div class="heading"><div><span class="eyebrow">PORTFOLIO</span><h1>Reports</h1><p>Review customer balances, agreement status, and sales by institution.</p></div><div class="actions"><a class="button outline" href="{% url 'records' 'follow-up' %}">Follow-up list</a><a class="button outline" href="{% url 'records' 'profit' %}">Cost and profit</a></div></div>
+{% include "profit_summary.html" %}
 <section class="card report-card"><h2>Customer balances</h2><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Credit agreements</th><th>Outstanding</th></tr></thead><tbody>
 {% for customer, totals in balances %}<tr><td><a href="{% url 'edit' 'customers' customer.pk %}">{{ customer }}</a></td><td>{{ customer.phone }}</td><td>{{ totals.0 }}</td><td>GH₵ {{ totals.2|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="4" class="empty">No credit agreements.</td></tr>{% endfor %}
 </tbody></table></div>{% include "pagination.html" with page_obj=balances pagination_label="Balances pages" %}</section>
