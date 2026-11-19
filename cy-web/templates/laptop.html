@@ -24,5 +24,5 @@
 </dl></section></div>
 {% if sale_history %}<section class="card"><h2>Sale history</h2><div class="table-wrap"><table><thead><tr><th>Agreement</th><th>Sale date</th><th>Status</th></tr></thead><tbody>
 {% for sale in sale_history %}<tr><td><a href="{% url 'edit' 'sales' sale.pk %}">{{ sale.code }}</a></td><td>{{ sale.date|date:"d M Y" }}</td><td>{% if sale.returned_on %}Returned {{ sale.returned_on|date:"d M Y" }}{% else %}Sold{% endif %}</td></tr>{% endfor %}
-</tbody></table></div></section>{% endif %}
+</tbody></table></div>{% include "pagination.html" with page_obj=sale_history pagination_label="Sale history pages" %}</section>{% endif %}
 {% endblock %}

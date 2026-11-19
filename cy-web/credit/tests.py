@@ -157,6 +157,18 @@ class CreditWorkflowTests(TestCase):
         self.assertNotContains(self.client.get("/inventory/?stock=1"), self.laptop.serial)
         self.assertEqual(self.laptop.sale_history.count(), 2)
 
+    def test_pagination_preserves_search_and_filters(self):
+        for index in range(23):
+            Customer.objects.create(code=f"PAGE-{index}", full_name=f"Paged Customer {index}", phone="")
+        response = self.client.get("/customers/?q=Paged&page=2")
+        page = response.context["rows"]
+        self.assertEqual(len(page), 10)
+        self.assertEqual(page.paginator.count, 23)
+        self.assertIn("q=Paged", page.next_url)
+        self.assertIn("page=3", page.next_url)
+        self.assertContains(response, 'aria-current="page"')
+        self.assertEqual(self.client.get("/customers/?q=Paged&page=999").context["rows"].number, 3)
+
     def test_profit_summary_collections_and_settlement(self):
         from .views import profit_summary
 

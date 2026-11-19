@@ -2,9 +2,11 @@
 <nav class="pagination" aria-label="{{ pagination_label|default:'Table pages' }}">
   <span>{{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
   <div class="actions">
-    {% if page_obj.has_previous %}<a class="button outline small" href="{{ page_obj.previous_url }}">Previous</a>{% endif %}
-    <span aria-current="page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a class="button outline small" href="{{ page_obj.next_url }}">Next</a>{% endif %}
+    {% if page_obj.has_previous %}<a class="button outline small" href="{{ page_obj.first_url }}">First</a><a class="button outline small" href="{{ page_obj.previous_url }}">Previous</a>{% endif %}
+    {% for number, url in page_obj.numbered_links %}
+      {% if number == page_obj.number %}<span class="button small" aria-current="page">{{ number }}</span>{% else %}<a class="button outline small" href="{{ url }}" aria-label="Page {{ number }}">{{ number }}</a>{% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}<a class="button outline small" href="{{ page_obj.next_url }}">Next</a><a class="button outline small" href="{{ page_obj.last_url }}">Last</a>{% endif %}
   </div>
 </nav>
 {% endif %}

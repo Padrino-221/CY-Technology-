@@ -41,7 +41,7 @@ def search_text(request):
 
 
 def paginate(request, rows, parameter="page"):
-    page = Paginator(rows, 25).get_page(request.GET.get(parameter))
+    page = Paginator(rows, 10).get_page(request.GET.get(parameter))
     query = request.GET.copy()
     if page.has_previous():
         query[parameter] = page.previous_page_number()
@@ -49,6 +49,15 @@ def paginate(request, rows, parameter="page"):
     if page.has_next():
         query[parameter] = page.next_page_number()
         page.next_url = "?" + query.urlencode()
+    links = []
+    for number in range(max(1, page.number - 2), min(page.paginator.num_pages, page.number + 2) + 1):
+        query[parameter] = number
+        links.append((number, "?" + query.urlencode()))
+    page.numbered_links = links
+    query[parameter] = 1
+    page.first_url = "?" + query.urlencode()
+    query[parameter] = page.paginator.num_pages
+    page.last_url = "?" + query.urlencode()
     return page
 
 
@@ -497,13 +506,14 @@ def record_form(request, section, pk, editing):
             "title": f"{instance.brand} {instance.model}", "section": section,
             "laptop": instance, "photos": list(instance.photos.all()),
             "active_sale": active_sales().filter(laptop=instance).first(),
-            "sale_history": instance.sale_history.order_by("-date", "-pk"),
+            "sale_history": paginate(request, instance.sale_history.order_by("-date", "-pk")),
             "can_delete": not instance.sale_history.exists(),
         })
     if instance and model is Sale and not editing:
         return render(request, "sale.html", {
             "section": section, "sale": instance,
-            "payment_page": paginate(request, instance.payments.order_by("-date", "-time", "-pk")),
+            "payment_page": paginate(request, instance.payments.order_by("-date", "-time", "-pk"), "payments_page"),
+            "refund_page": paginate(request, instance.refunds.order_by("-date", "-pk"), "refunds_page"),
         })
     form_class = {Customer: CustomerForm, Laptop: LaptopForm, Sale: SaleForm, Payment: PaymentForm}[model]
     form = form_class(
